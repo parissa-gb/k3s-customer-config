@@ -1,0 +1,71 @@
+{{- $customer := (.Values.customer) -}}
+{{- if eq $customer "" -}}
+{{- fail "Missing required value: customer. Use: helmfile --environment default --state-values-set customer=<customer-id> <cmd>" -}}
+{{- end -}}
+
+environments:
+  default:
+    values:
+      - customers/{{ $customer }}/customer.yaml
+      - customers/{{ $customer }}/lock.yaml
+
+---
+
+{{- $customer := (.Values.customer) -}}
+{{- if eq $customer "" -}}
+{{- fail "Missing required value: customer" -}}
+{{- end -}}
+
+{{- $ns := (.Values.namespace | default "goodbytz") -}} # nameSpace
+{{- $corePath := (.Values.coreRepoPath | required) -}}
+{{- $systemType := (.Values.systemType | required) -}}
+{{- $modules := (.Values | get "modules" (dict)) -}}
+{{- $coreTag := ($.Values.core.git.tag | default "") -}}
+{{- $coreCommit := ($.Values.core.git.commit | default "") -}}
+{{- $coreRef := (ternary $coreCommit $coreTag (ne $coreCommit "")) -}}
+{{- if eq $coreRef "" -}}
+{{- fail "lock.yaml must set core.git.tag or core.git.commit" -}}
+{{- end -}}
+
+helmDefaults:
+  wait: true
+
+releases:
+{{- /* iterate modules; no order - "needs"(dependency) has priority */ -}}
+{{- range $modName, $cfg := $modules }}
+{{- if ($cfg.enabled | default false) }}
+  - name: {{ printf "%s-%s-connector" $modName (($cfg.moduleNumber | default "01")) }}
+    namespace: {{ $ns }}
+    chart: {{ $corePath }}/charts/{{ $modName }}
+    installed: true
+
+    hooks:
+      - events: ["prepare"]
+        command: "bash"
+        args:
+          - "-lc"
+          - >
+            set -euo pipefail;
+            git -C {{ $corePath | quote }} checkout {{ $coreRef | quote }};
+            git -C {{ $corePath | quote }} rev-parse --short HEAD
+
+    labels:
+      customer: {{ $customer | quote }}
+      module: {{ $modName | quote }}
+      coreRelease: {{ $.Values.core.releaseVersion | default "unknown" | quote }}
+
+    {{- /* HIGH PRIORITY ORDERING: needs drives DAG */ -}}
+    {{- $deps := ($cfg.needs | default list) }}
+    {{- if $deps }}
+    needs:
+      {{- range $dep := $deps }}
+      {{- $depCfg := ($modules | get $dep (dict)) -}}
+      - {{ $ns }}/{{ printf "%s-%s-connector" $dep (($depCfg.moduleNumber | default "01")) }}
+      {{- end }}
+    {{- end }}
+
+    values:
+      - {{ $corePath }}/charts/{{ $modName }}/values/system-types/{{ $systemType }}.yaml
+      - customers/{{ $customer }}/connectors/{{ $modName }}.yaml
+{{- end }}
+{{- end }}

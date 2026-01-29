@@ -1,0 +1,16 @@
+# I have used this file instead of Environments, cause  "Environments" depprecation
+customer: rka02-n0006 # the main entry for this key-value is command line arg
+systemType: compact
+namespace: goodbytz
+customerLocation: ""
+customerName: ""
+
+
+# just temporal
+coreRepoPath: ../k3s-core-repo
+
+modules:
+  ipo:
+    enabled: true
+    moduleNumber: "01"
+    needs: [] # add other module names here if this module depends on them

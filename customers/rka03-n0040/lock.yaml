@@ -1,0 +1,5 @@
+core:
+  releaseVersion: "0.0.0-dev"
+  git:
+    tag: "v0.0.0-dev"
+    commit: ""
