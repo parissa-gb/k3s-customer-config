@@ -60,5 +60,10 @@ releases:
     values:
       - {{ $corePath }}/charts/{{ $modName }}/values/system-types/{{ $systemType }}.yaml
       - customers/{{ $customer }}/connectors/{{ $modName }}.yaml
+    set:
+      - name: moduleNumber
+        value: {{ ($cfg.moduleNumber | default "01") | quote }}
+      - name: systemType
+        value: {{ $systemType | quote }}
 {{- end }}
 {{- end }}
