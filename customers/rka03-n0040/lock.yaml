@@ -1,5 +1,5 @@
 core:
-  releaseVersion: "0.0.0-dev"
+  releaseVersion: "1.4.3"
   git:
-    tag: "v0.0.0-dev"
-    commit: ""
+    tag: "v1.4.3"
+    commit: "fcb35184a908cd0c4d3b2de6dad9b9fe78621166"

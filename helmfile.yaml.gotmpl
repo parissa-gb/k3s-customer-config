@@ -1,7 +1,4 @@
-{{- $customer := (.Values.customer) -}}
-{{- if eq $customer "" -}}
-{{- fail "Missing required value: customer. Use: helmfile --environment default --state-values-set customer=<customer-id> <cmd>" -}}
-{{- end -}}
+{{- $customer := (required "Missing required value: customer" .Values.customer | lower) -}}
 
 environments:
   default:
@@ -10,15 +7,11 @@ environments:
       - customers/{{ $customer }}/lock.yaml
 
 ---
+{{- $customer := (required "Missing required value: customer" .Values.customer | lower) -}}
 
-{{- $customer := (.Values.customer) -}}
-{{- if eq $customer "" -}}
-{{- fail "Missing required value: customer" -}}
-{{- end -}}
-
-{{- $ns := (.Values.namespace | default "goodbytz") -}} # nameSpace
-{{- $corePath := (.Values.coreRepoPath | required) -}}
-{{- $systemType := (.Values.systemType | required) -}}
+{{- $ns := (.Values.namespace | default "goodbytz") -}}
+{{- $corePath := required "coreRepoPath is required (set it in customers/<id>/customer.yaml)" .Values.coreRepoPath -}}
+{{- $systemType := required "systemType is required (set it in customers/<id>/customer.yaml)" .Values.systemType |lower -}}
 {{- $modules := (.Values | get "modules" (dict)) -}}
 {{- $coreTag := ($.Values.core.git.tag | default "") -}}
 {{- $coreCommit := ($.Values.core.git.commit | default "") -}}

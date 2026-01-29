@@ -1,10 +1,9 @@
 # I have used this file instead of Environments, cause  "Environments" depprecation
-customer: rka02-n0006 # the main entry for this key-value is command line arg
-systemType: compact
+customer:   RKA02-n0006 # CASE INSENSITIVE; the main entry for this key-value is command line arg
+systemType: COMPact # Case insensitive
 namespace: goodbytz
 customerLocation: ""
 customerName: ""
-
 
 # just temporal
 coreRepoPath: ../k3s-core-repo
