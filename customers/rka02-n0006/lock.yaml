@@ -1,5 +1,5 @@
 core:
   releaseVersion: "1.4.3"
   git:
-    tag: "v1.4.3"
-    commit: "fcb35184a908cd0c4d3b2de6dad9b9fe7862116"
+    tag: ""
+    commit: "4909a9013e48aec02c5a5d972950061068918bea"
